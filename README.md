@@ -53,25 +53,25 @@ Understanding the domain model of modern identity providers allows for a clean s
 ### Entity Relationship Model
 
 
-+----------------+       +-------------------+       +----------------------+
-|     Realm      |<1---*|      Client       |<1---*|    ClientRedirectUri |
-+----------------+       +-------------------+       +----------------------+
-| id (UUID)      |       | id (UUID)         |       | uri                  |
-| name           |       | client_id         |       +----------------------+
-| enabled        |       | client_secret_hash|
-+----------------+       | grant_types       |
-│                +-------------------+
-│1
-└───────* +-------------------+       +----------------------+
-|       User        |<*---*>|         Role         |
-+-------------------+       +----------------------+
-| id (UUID)         |       | id (UUID)            |
-| username          |       | name                 |
-| email             |       | permissions (JSON)   |
-| password_hash     |       +----------------------+
-| enabled           |
-+-------------------+
-
++------------------+         +--------------------+         +-----------------------+
+|      Realm       | <1---*  |       Client       | <1---*  |   ClientRedirectUri   |
++------------------+         +--------------------+         +-----------------------+
+| id (UUID)        |         | id (UUID)          |         | id (UUID)             |
+| name             |         | client_id          |         | uri                   |
+| enabled          |         | client_secret_hash |         +-----------------------+
++------------------+         | grant_types        |
+          │                  +--------------------+
+          │ 1
+          │
+          └─── * +--------------------+         +-----------------------+
+                 |        User        | <*---*> |         Role          |
+                 +--------------------+         +-----------------------+
+                 | id (UUID)          |         | id (UUID)             |
+                 | username           |         | name                  |
+                 | email              |         | permissions (JSON)    |
+                 | password_hash      |         +-----------------------+
+                 | enabled            |
+                 +--------------------+
 
 
 ### Core Service & Security Components
