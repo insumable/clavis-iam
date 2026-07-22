@@ -22,8 +22,7 @@ To keep the project both achievable and impressive on a resume, **Clavis-IAM** f
 
 Understanding the domain model of modern identity providers allows for a clean separation of concerns in database design and request processing pipelines.
 
-
-
+```text
    [ Realm ] (Security boundary per tenant)
        │
  ┌─────┴───────────────────┐
@@ -36,7 +35,7 @@ Understanding the domain model of modern identity providers allows for a clean s
 ├─ Client Secrets          └─ Active Sessions & Refresh Tokens
 └─ Allowed Scopes
 
-
+```
 
 ### Key IAM Concepts Implemented
 | Concept | Description & Implementation Detail |
@@ -52,7 +51,7 @@ Understanding the domain model of modern identity providers allows for a clean s
 
 ### Entity Relationship Model
 
-
+```text
 +------------------+         +--------------------+         +-----------------------+
 |      Realm       | <1---*  |       Client       | <1---*  |   ClientRedirectUri   |
 +------------------+         +--------------------+         +-----------------------+
@@ -72,7 +71,7 @@ Understanding the domain model of modern identity providers allows for a clean s
                  | password_hash      |         +-----------------------+
                  | enabled            |
                  +--------------------+
-
+```
 
 ### Core Service & Security Components
 
@@ -133,5 +132,3 @@ Understanding the domain model of modern identity providers allows for a clean s
 > * Designed RSA-signed JWT token issuance and dynamic JWKS endpoints (`/.well-known/jwks.json`) enabling distributed stateless token verification.
 > * Integrated **Redis** for high-throughput session tracking and token revocation (JTI blacklisting) maintaining sub-10ms validation latency.
 > * Implemented multi-realm data isolation, custom Argon2 password hashing, and TOTP-based Multi-Factor Authentication (MFA).
-
-```
