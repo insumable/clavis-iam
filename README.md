@@ -27,7 +27,6 @@ Understanding the domain model of modern identity providers allows for a clean s
        │
  ┌─────┴───────────────────┐
  ▼                         ▼
-
 [ Clients ]                [ Users ]
 (Apps using Clavis-IAM)       │
 │                          ├─ Credentials (Argon2 / BCrypt Hashes)
