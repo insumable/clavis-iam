@@ -121,13 +121,3 @@ Understanding the domain model of modern identity providers allows for a clean s
 * **Asymmetric Cryptography:** Direct experience managing RSA key pairs, JWT signatures, and JSON Web Key Sets (JWKS).
 * **Hybrid Session Security:** Combining stateless JWT validation with distributed Redis state for instant token revocation.
 * **Deep Spring Security Customization:** Extending default filter chains and authentication providers without violating standard OAuth specs.
-
----
-
-## Resume Highlights
-
-> **Project: Clavis-IAM — Lightweight Distributed OAuth2/OIDC Identity Provider**
-> * Architected a multi-tenant Identity & Access Management system using **Spring Boot 3**, **Security 6**, and **PostgreSQL**, fully compliant with OIDC & OAuth2 (PKCE) standards.
-> * Designed RSA-signed JWT token issuance and dynamic JWKS endpoints (`/.well-known/jwks.json`) enabling distributed stateless token verification.
-> * Integrated **Redis** for high-throughput session tracking and token revocation (JTI blacklisting) maintaining sub-10ms validation latency.
-> * Implemented multi-realm data isolation, custom Argon2 password hashing, and TOTP-based Multi-Factor Authentication (MFA).
