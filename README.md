@@ -1,8 +1,8 @@
 # Clavis-IAM 🔑
 
-Clavis-IAM is a lightweight, monolithic Identity and Access Management (IAM) server built with **Spring Boot 3**, **Spring Security 6**, and **Spring Data JPA** backed by **PostgreSQL**[cite: 1]. 
+Clavis-IAM is a lightweight, monolithic Identity and Access Management (IAM) server built with **Spring Boot 3**, **Spring Security 6**, and **Spring Data JPA** backed by **PostgreSQL**. 
 
-Designed as a clean alternative to legacy enterprise tools like Keycloak, it delivers a production-ready OAuth 2.0 and OpenID Connect (OIDC) engine optimized for modern web applications and microservices[cite: 1].
+Designed as a clean alternative to legacy enterprise tools like Keycloak, it delivers a production-ready OAuth 2.0 and OpenID Connect (OIDC) engine optimized for modern web applications and microservices.
 
 ---
 
@@ -69,7 +69,7 @@ When building Clavis-IAM, several architectural decisions were made to balance i
           ├── Redirect URIs
           ├── Client Secrets
           └── Allowed Scopes
-```[cite: 1]
+```
 
 ## Entity Relationship Model
 
@@ -95,7 +95,7 @@ When building Clavis-IAM, several architectural decisions were made to balance i
                  | password_hash      |         +-----------------------+
                  | enabled            |
                  +--------------------+
-```[cite: 1]
+```
 
 ---
 
@@ -191,11 +191,11 @@ services:
 
 volumes:
   postgres_data:
-```[cite: 1]
+```
 
 ## Running the Application
 
 1. Set up your local environment file (`.env`) containing your production secrets (database credentials and RSA keys).
-2. Start the services using Docker Compose[cite: 1]:
+2. Start the services using Docker Compose:
    ```bash
    docker-compose up --build -d
