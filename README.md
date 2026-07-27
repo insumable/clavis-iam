@@ -8,17 +8,17 @@ Designed as a clean alternative to legacy enterprise tools like Keycloak, it del
 
 # 1. Project Overview
 
-Clavis-IAM implements standard authorization and authentication flows cleanly within a single Spring Boot application[cite: 1].
+Clavis-IAM implements standard authorization and authentication flows cleanly within a single Spring Boot application
 
 ## Key Capabilities
 
-- **OAuth 2.0 & OIDC Engine:** Implements Authorization Code Flow with PKCE (RFC 7636)[cite: 1].
-- **Multi-Tenancy ("Realms"):** Logical data isolation boundaries separating users, credentials, clients, and roles per tenant[cite: 1].
-- **Stateless Token Minting:** Issues cryptographically signed RSA Access Tokens, ID Tokens, and Refresh Tokens[cite: 1].
-- **JWKS Key Distribution:** Exposes `/.well-known/jwks.json` for external stateless token verification[cite: 1].
-- **Embedded UI:** Server-rendered pages (Thymeleaf + Tailwind CSS) for multi-tenant Login, Registration, and OAuth2 Consent[cite: 1].
-- **BCrypt Credential Hashing:** Secure password hashing using `BCryptPasswordEncoder`[cite: 1].
-- **Administrative REST API:** Full programmatic control over realms, clients, users, and roles[cite: 1].
+- **OAuth 2.0 & OIDC Engine:** Implements Authorization Code Flow with PKCE (RFC 7636).
+- **Multi-Tenancy ("Realms"):** Logical data isolation boundaries separating users, credentials, clients, and roles per tenant.
+- **Stateless Token Minting:** Issues cryptographically signed RSA Access Tokens, ID Tokens, and Refresh Tokens.
+- **JWKS Key Distribution:** Exposes `/.well-known/jwks.json` for external stateless token verification.
+- **Embedded UI:** Server-rendered pages (Thymeleaf + Tailwind CSS) for multi-tenant Login, Registration, and OAuth2 Consent.
+- **BCrypt Credential Hashing:** Secure password hashing using `BCryptPasswordEncoder`.
+- **Administrative REST API:** Full programmatic control over realms, clients, users, and roles.
 
 ---
 
@@ -26,13 +26,13 @@ Clavis-IAM implements standard authorization and authentication flows cleanly wi
 
 | Category | Technology |
 |----------|------------|
-| **Language & Framework** | Java 17+, Spring Boot 3.2+[cite: 1] |
-| **Security** | Spring Security 6, Spring Authorization Server[cite: 1] |
-| **Persistence** | Spring Data JPA, PostgreSQL 15, Flyway Migrations[cite: 1] |
-| **Frontend UI** | Thymeleaf, Tailwind CSS[cite: 1] |
-| **Observability & Docs** | Spring Boot Actuator, SpringDoc OpenAPI[cite: 1] |
-| **Testing** | JUnit 5, Testcontainers[cite: 1] |
-| **Containerization** | Docker, Docker Compose, GitHub Actions CI[cite: 1] |
+| **Language & Framework** | Java 17+, Spring Boot 3.2+ |
+| **Security** | Spring Security 6, Spring Authorization Server |
+| **Persistence** | Spring Data JPA, PostgreSQL 15, Flyway Migrations |
+| **Frontend UI** | React, Tailwind CSS |
+| **Observability & Docs** | Spring Boot Actuator, SpringDoc OpenAPI |
+| **Testing** | JUnit 5, Testcontainers|
+| **Containerization** | Docker, Docker Compose, GitHub Actions CI |
 
 ---
 
@@ -42,12 +42,12 @@ When building Clavis-IAM, several architectural decisions were made to balance i
 
 1. **Monolithic vs. Microservice IAM:**
    * *Trade-off:* Chose a modular monolith instead of a distributed IAM cluster.
-   * *Why:* For small-to-medium systems, a monolith eliminates distributed tracing complexity, network hops, and operational overhead while still maintaining strict logical boundaries via multi-tenant realms[cite: 1].
+   * *Why:* For small-to-medium systems, a monolith eliminates distributed tracing complexity, network hops, and operational overhead while still maintaining strict logical boundaries via multi-tenant realms.
 2. **Stateless JWTs vs. State Sessions:**
-   * *Trade-off:* Relied on cryptographically signed JWTs paired with a secure refresh token rotation strategy[cite: 1].
-   * *Why:* Offloads token validation overhead from the database to individual resource servers via JWKS distribution, while token rotation mitigates leakage risks[cite: 1].
+   * *Trade-off:* Relied on cryptographically signed JWTs paired with a secure refresh token rotation strategy.
+   * *Why:* Offloads token validation overhead from the database to individual resource servers via JWKS distribution, while token rotation mitigates leakage risks.
 3. **Flyway vs. Hibernate Auto DDL:**
-   * *Trade-off:* Swapped `spring.jpa.hibernate.ddl-auto=update` for explicit version-controlled Flyway migrations[cite: 1].
+   * *Trade-off:* Swapped `spring.jpa.hibernate.ddl-auto=update` for explicit version-controlled Flyway migrations.
    * *Why:* Essential for production environments to prevent unintended destructive schema modifications and maintain a predictable audit trail of database evolutions.
 
 ---
@@ -102,42 +102,42 @@ When building Clavis-IAM, several architectural decisions were made to balance i
 # 5. Models / JPA Entities
 
 ## Realm
-Logical security domain[cite: 1].
-- UUID `id`, String `name`, boolean `enabled`, Instant `createdAt`[cite: 1]
+Logical security domain.
+- UUID `id`, String `name`, boolean `enabled`, Instant `createdAt`
 
 ## Client
-OAuth2 client application registered under a specific realm[cite: 1].
-- UUID `id`, String `clientId`, String `clientSecretHash`, `Set<String>` `grantTypes`, `Set<String>` `scopes`, `Realm realm`[cite: 1]
+OAuth2 client application registered under a specific realm.
+- UUID `id`, String `clientId`, String `clientSecretHash`, `Set<String>` `grantTypes`, `Set<String>` `scopes`, `Realm realm`
 
 ## ClientRedirectUri
-Allowed OAuth2 redirect URIs for a client application[cite: 1].
-- UUID `id`, String `uri`, `Client client`[cite: 1]
+Allowed OAuth2 redirect URIs for a client application.
+- UUID `id`, String `uri`, `Client client`
 
 ## User
-End-user identity scoped to a realm[cite: 1].
-- UUID `id`, String `username`, String `email`, String `passwordHash`, boolean `enabled`, `Realm realm`, `Set<Role>` `roles`[cite: 1]
+End-user identity scoped to a realm.
+- UUID `id`, String `username`, String `email`, String `passwordHash`, boolean `enabled`, `Realm realm`, `Set<Role>` `roles`
 
 ## Role
-Permissions container associated with users[cite: 1].
-- UUID `id`, String `name`, String `description`, `Realm realm`, `Set<User>` `users`[cite: 1]
+Permissions container associated with users.
+- UUID `id`, String `name`, String `description`, `Realm realm`, `Set<User>` `users`
 
 ---
 
 # 6. Repositories (Spring Data JPA)
 
-- **RealmRepository:** `Optional<Realm> findByName(String name);`[cite: 1]
-- **ClientRepository:** `Optional<Client> findByClientIdAndRealmName(String clientId, String realmName);`[cite: 1]
-- **UserRepository:** `Optional<User> findByUsernameAndRealmName(String username, String realmName);`, `Optional<User> findByEmailAndRealmName(String email, String realmName);`[cite: 1]
-- **RoleRepository:** `Optional<Role> findByNameAndRealmName(String name, String realmName);`[cite: 1]
+- **RealmRepository:** `Optional<Realm> findByName(String name);
+- **ClientRepository:** `Optional<Client> findByClientIdAndRealmName(String clientId, String realmName);
+- **UserRepository:** `Optional<User> findByUsernameAndRealmName(String username, String realmName);`, `Optional<User> findByEmailAndRealmName(String email, String realmName);
+- **RoleRepository:** `Optional<Role> findByNameAndRealmName(String name, String realmName);
 
 ---
 
 # 7. Configuration & Security Layer
 
-- **SecurityConfig:** Defines the primary `SecurityFilterChain` for OAuth2 endpoints, login pages, and secured administrative APIs[cite: 1].
-- **AuthorizationServerConfig:** Configures Spring Authorization Server beans, token signing, and OIDC support[cite: 1].
-- **JwtConfig:** Manages the RSA `KeyPair` for signing JWT Access and ID Tokens[cite: 1].
-- **PasswordEncoderConfig:** Provides `BCryptPasswordEncoder(12)`[cite: 1].
+- **SecurityConfig:** Defines the primary `SecurityFilterChain` for OAuth2 endpoints, login pages, and secured administrative APIs.
+- **AuthorizationServerConfig:** Configures Spring Authorization Server beans, token signing, and OIDC support.
+- **JwtConfig:** Manages the RSA `KeyPair` for signing JWT Access and ID Tokens.
+- **PasswordEncoderConfig:** Provides `BCryptPasswordEncoder(12).
 
 ---
 
@@ -146,13 +146,13 @@ Permissions container associated with users[cite: 1].
 ## Protocol & Discovery Endpoints
 | Method | Endpoint | Description |
 |---|---|---|
-| GET | `/auth/realms/{realm}/.well-known/openid-configuration` | OIDC Discovery Metadata[cite: 1] |
-| GET | `/auth/realms/{realm}/.well-known/jwks.json` | Public RSA keys[cite: 1] |
-| GET | `/auth/realms/{realm}/protocol/openid-connect/auth` | Authorization Endpoint (PKCE)[cite: 1] |
-| POST | `/auth/realms/{realm}/protocol/openid-connect/token` | Token Exchange & Refresh Rotation[cite: 1] |
+| GET | `/auth/realms/{realm}/.well-known/openid-configuration` | OIDC Discovery Metadata |
+| GET | `/auth/realms/{realm}/.well-known/jwks.json` | Public RSA keys |
+| GET | `/auth/realms/{realm}/protocol/openid-connect/auth` | Authorization Endpoint (PKCE) |
+| POST | `/auth/realms/{realm}/protocol/openid-connect/token` | Token Exchange & Refresh Rotation |
 
 ## Administrative REST API (`/api/v1/admin`)
-Protected via strict admin authentication models and documented via **SpringDoc OpenAPI** (`/swagger-ui.html`)[cite: 1].
+Protected via strict admin authentication models and documented via **SpringDoc OpenAPI** (`/swagger-ui.html`).
 
 ---
 
