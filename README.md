@@ -1,24 +1,24 @@
 # Clavis-IAM 🔑
 
-Clavis-IAM is a lightweight, monolithic Identity and Access Management (IAM) server built with **Spring Boot 3**, **Spring Security 6**, and **Spring Data JPA** backed by **PostgreSQL**. 
+Clavis-IAM is a lightweight, monolithic Identity and Access Management (IAM) server built with **Spring Boot 3**, **Spring Security 6**, and **Spring Data JPA** backed by **PostgreSQL**[cite: 1]. 
 
-Designed as a clean alternative to legacy enterprise tools like Keycloak, it delivers a production-ready OAuth 2.0 and OpenID Connect (OIDC) engine optimized for modern web applications and microservices.
+Designed as a clean alternative to legacy enterprise tools like Keycloak, it delivers a production-ready OAuth 2.0 and OpenID Connect (OIDC) engine optimized for modern web applications and microservices[cite: 1].
 
 ---
 
 # 1. Project Overview
 
-Clavis-IAM implements standard authorization and authentication flows cleanly within a single Spring Boot application.
+Clavis-IAM implements standard authorization and authentication flows cleanly within a single Spring Boot application[cite: 1].
 
 ## Key Capabilities
 
-- **OAuth 2.0 & OIDC Engine:** Implements Authorization Code Flow with PKCE (RFC 7636).
-- **Multi-Tenancy ("Realms"):** Logical data isolation boundaries separating users, credentials, clients, and roles per tenant.
-- **Stateless Token Minting:** Issues cryptographically signed RSA Access Tokens, ID Tokens, and Refresh Tokens.
-- **JWKS Key Distribution:** Exposes `/.well-known/jwks.json` for external stateless token verification.
-- **Embedded UI:** Server-rendered pages (Thymeleaf + Tailwind CSS) for multi-tenant Login, Registration, and OAuth2 Consent.
-- **BCrypt Credential Hashing:** Secure password hashing using `BCryptPasswordEncoder`.
-- **Administrative REST API:** Full programmatic control over realms, clients, users, and roles.
+- **OAuth 2.0 & OIDC Engine:** Implements Authorization Code Flow with PKCE (RFC 7636)[cite: 1].
+- **Multi-Tenancy ("Realms"):** Logical data isolation boundaries separating users, credentials, clients, and roles per tenant[cite: 1].
+- **Stateless Token Minting:** Issues cryptographically signed RSA Access Tokens, ID Tokens, and Refresh Tokens[cite: 1].
+- **JWKS Key Distribution:** Exposes `/.well-known/jwks.json` for external stateless token verification[cite: 1].
+- **Embedded UI:** Server-rendered pages (Thymeleaf + Tailwind CSS) for multi-tenant Login, Registration, and OAuth2 Consent[cite: 1].
+- **BCrypt Credential Hashing:** Secure password hashing using `BCryptPasswordEncoder`[cite: 1].
+- **Administrative REST API:** Full programmatic control over realms, clients, users, and roles[cite: 1].
 
 ---
 
@@ -26,15 +26,33 @@ Clavis-IAM implements standard authorization and authentication flows cleanly wi
 
 | Category | Technology |
 |----------|------------|
-| **Language & Framework** | Java 17+, Spring Boot 3.2+ |
-| **Security** | Spring Security 6, Spring Authorization Server |
-| **Persistence** | Spring Data JPA, PostgreSQL 15 |
-| **Frontend UI** | Thymeleaf, Tailwind CSS |
-| **Containerization** | Docker, Docker Compose |
+| **Language & Framework** | Java 17+, Spring Boot 3.2+[cite: 1] |
+| **Security** | Spring Security 6, Spring Authorization Server[cite: 1] |
+| **Persistence** | Spring Data JPA, PostgreSQL 15, Flyway Migrations[cite: 1] |
+| **Frontend UI** | Thymeleaf, Tailwind CSS[cite: 1] |
+| **Observability & Docs** | Spring Boot Actuator, SpringDoc OpenAPI[cite: 1] |
+| **Testing** | JUnit 5, Testcontainers[cite: 1] |
+| **Containerization** | Docker, Docker Compose, GitHub Actions CI[cite: 1] |
 
 ---
 
-# 3. Architecture & Domain Model
+# 3. Engineering Design Trade-Offs & Decisions
+
+When building Clavis-IAM, several architectural decisions were made to balance implementation velocity, enterprise security standards, and operational simplicity:
+
+1. **Monolithic vs. Microservice IAM:**
+   * *Trade-off:* Chose a modular monolith instead of a distributed IAM cluster.
+   * *Why:* For small-to-medium systems, a monolith eliminates distributed tracing complexity, network hops, and operational overhead while still maintaining strict logical boundaries via multi-tenant realms[cite: 1].
+2. **Stateless JWTs vs. State Sessions:**
+   * *Trade-off:* Relied on cryptographically signed JWTs paired with a secure refresh token rotation strategy[cite: 1].
+   * *Why:* Offloads token validation overhead from the database to individual resource servers via JWKS distribution, while token rotation mitigates leakage risks[cite: 1].
+3. **Flyway vs. Hibernate Auto DDL:**
+   * *Trade-off:* Swapped `spring.jpa.hibernate.ddl-auto=update` for explicit version-controlled Flyway migrations[cite: 1].
+   * *Why:* Essential for production environments to prevent unintended destructive schema modifications and maintain a predictable audit trail of database evolutions.
+
+---
+
+# 4. Architecture & Domain Model
 
 ```text
                     [ Realm ]
@@ -46,12 +64,12 @@ Clavis-IAM implements standard authorization and authentication flows cleanly wi
           │                     │
           │                     ├── Credentials (BCrypt)
           │                     ├── Roles
-          │                     └── Refresh Tokens
+          │                     └── Refresh Tokens (with Rotation)
           │
           ├── Redirect URIs
           ├── Client Secrets
           └── Allowed Scopes
-```
+```[cite: 1]
 
 ## Entity Relationship Model
 
@@ -77,235 +95,68 @@ Clavis-IAM implements standard authorization and authentication flows cleanly wi
                  | password_hash      |         +-----------------------+
                  | enabled            |
                  +--------------------+
-```
+```[cite: 1]
 
 ---
 
-# 4. Models / JPA Entities
+# 5. Models / JPA Entities
 
 ## Realm
-
-Logical security domain.
-
-**Fields**
-
-- UUID `id`
-- String `name`
-- boolean `enabled`
-- Instant `createdAt`
-
----
+Logical security domain[cite: 1].
+- UUID `id`, String `name`, boolean `enabled`, Instant `createdAt`[cite: 1]
 
 ## Client
-
-OAuth2 client application registered under a specific realm.
-
-**Fields**
-
-- UUID `id`
-- String `clientId`
-- String `clientSecretHash`
-- `Set<String>` `grantTypes`
-- `Set<String>` `scopes`
-- `Realm realm`
-
----
+OAuth2 client application registered under a specific realm[cite: 1].
+- UUID `id`, String `clientId`, String `clientSecretHash`, `Set<String>` `grantTypes`, `Set<String>` `scopes`, `Realm realm`[cite: 1]
 
 ## ClientRedirectUri
-
-Allowed OAuth2 redirect URIs for a client application.
-
-**Fields**
-
-- UUID `id`
-- String `uri`
-- `Client client`
-
----
+Allowed OAuth2 redirect URIs for a client application[cite: 1].
+- UUID `id`, String `uri`, `Client client`[cite: 1]
 
 ## User
-
-End-user identity scoped to a realm.
-
-**Fields**
-
-- UUID `id`
-- String `username`
-- String `email`
-- String `passwordHash`
-- boolean `enabled`
-- `Realm realm`
-- `Set<Role>` `roles`
-
----
+End-user identity scoped to a realm[cite: 1].
+- UUID `id`, String `username`, String `email`, String `passwordHash`, boolean `enabled`, `Realm realm`, `Set<Role>` `roles`[cite: 1]
 
 ## Role
-
-Permissions container associated with users.
-
-**Fields**
-
-- UUID `id`
-- String `name`
-- String `description`
-- `Realm realm`
-- `Set<User>` `users`
+Permissions container associated with users[cite: 1].
+- UUID `id`, String `name`, String `description`, `Realm realm`, `Set<User>` `users`[cite: 1]
 
 ---
 
-# 5. Repositories (Spring Data JPA)
+# 6. Repositories (Spring Data JPA)
 
-## RealmRepository
-
-Query realms by unique name.
-
-```java
-Optional<Realm> findByName(String name);
-```
+- **RealmRepository:** `Optional<Realm> findByName(String name);`[cite: 1]
+- **ClientRepository:** `Optional<Client> findByClientIdAndRealmName(String clientId, String realmName);`[cite: 1]
+- **UserRepository:** `Optional<User> findByUsernameAndRealmName(String username, String realmName);`, `Optional<User> findByEmailAndRealmName(String email, String realmName);`[cite: 1]
+- **RoleRepository:** `Optional<Role> findByNameAndRealmName(String name, String realmName);`[cite: 1]
 
 ---
 
-## ClientRepository
+# 7. Configuration & Security Layer
 
-Query client applications within a target realm.
-
-```java
-Optional<Client> findByClientIdAndRealmName(String clientId, String realmName);
-```
-
----
-
-## UserRepository
-
-Fetch users by username/email within a specific realm.
-
-```java
-Optional<User> findByUsernameAndRealmName(String username, String realmName);
-
-Optional<User> findByEmailAndRealmName(String email, String realmName);
-```
+- **SecurityConfig:** Defines the primary `SecurityFilterChain` for OAuth2 endpoints, login pages, and secured administrative APIs[cite: 1].
+- **AuthorizationServerConfig:** Configures Spring Authorization Server beans, token signing, and OIDC support[cite: 1].
+- **JwtConfig:** Manages the RSA `KeyPair` for signing JWT Access and ID Tokens[cite: 1].
+- **PasswordEncoderConfig:** Provides `BCryptPasswordEncoder(12)`[cite: 1].
 
 ---
 
-## RoleRepository
-
-Manage role definitions per realm.
-
-```java
-Optional<Role> findByNameAndRealmName(String name, String realmName);
-```
-
----
-
-# 6. Configuration Layer
-
-## SecurityConfig
-
-Defines the primary `SecurityFilterChain` for:
-
-- OAuth2 endpoints
-- Login pages
-- Admin REST APIs
-
----
-
-## AuthorizationServerConfig
-
-Registers Spring Authorization Server beans.
-
-Responsibilities:
-
-- OAuth2 Authorization Server configuration
-- Custom JWT claims
-- Token signing
-- OIDC support
-
----
-
-## JwtConfig
-
-Generates and manages the RSA `KeyPair` used to sign JWT Access Tokens and ID Tokens.
-
----
-
-## PasswordEncoderConfig
-
-Provides:
-
-```java
-BCryptPasswordEncoder(12)
-```
-
----
-
-# 7. Controller Endpoints
+# 8. Controller Endpoints
 
 ## Protocol & Discovery Endpoints
-
 | Method | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/auth/realms/{realm}/.well-known/openid-configuration` | Returns OIDC Discovery Metadata |
-| GET | `/auth/realms/{realm}/.well-known/jwks.json` | Returns public RSA keys |
-| GET | `/auth/realms/{realm}/protocol/openid-connect/auth` | Authorization Endpoint (PKCE) |
-| POST | `/auth/realms/{realm}/protocol/openid-connect/token` | Exchanges Authorization Code for Tokens |
+|---|---|---|
+| GET | `/auth/realms/{realm}/.well-known/openid-configuration` | OIDC Discovery Metadata[cite: 1] |
+| GET | `/auth/realms/{realm}/.well-known/jwks.json` | Public RSA keys[cite: 1] |
+| GET | `/auth/realms/{realm}/protocol/openid-connect/auth` | Authorization Endpoint (PKCE)[cite: 1] |
+| POST | `/auth/realms/{realm}/protocol/openid-connect/token` | Token Exchange & Refresh Rotation[cite: 1] |
+
+## Administrative REST API (`/api/v1/admin`)
+Protected via strict admin authentication models and documented via **SpringDoc OpenAPI** (`/swagger-ui.html`)[cite: 1].
 
 ---
 
-## User Interface & Authentication
-
-| Method | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/auth/realms/{realm}/login` | Login Page |
-| POST | `/auth/realms/{realm}/login` | Authenticates User |
-| GET | `/auth/realms/{realm}/consent` | OAuth2 Consent Page |
-| POST | `/auth/realms/{realm}/consent` | Accepts or Rejects Consent |
-
----
-
-## Administrative REST API
-
-Base Path
-
-```text
-/api/v1/admin
-```
-
-| Method | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/api/v1/admin/realms` | Create Realm |
-| GET | `/api/v1/admin/realms` | List Realms |
-| POST | `/api/v1/admin/{realm}/clients` | Register OAuth Client |
-| GET | `/api/v1/admin/{realm}/clients` | List Clients |
-| POST | `/api/v1/admin/{realm}/users` | Create User |
-| POST | `/api/v1/admin/{realm}/roles` | Create Role |
-
----
-
-# 8. Docker Deployment
-
-## Dockerfile
-
-```dockerfile
-FROM eclipse-temurin:17-jdk-alpine AS build
-
-WORKDIR /app
-
-COPY . .
-
-RUN ./mvnw clean package -DskipTests
-
-FROM eclipse-temurin:17-jre-alpine
-
-WORKDIR /app
-
-COPY --from=build /app/target/*.jar app.jar
-
-EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "app.jar"]
-```
-
----
+# 9. Docker & Production Deployment
 
 ## docker-compose.yml
 
@@ -317,9 +168,9 @@ services:
     image: postgres:15-alpine
     container_name: clavis-db
     environment:
-      POSTGRES_DB: clavis_iam
-      POSTGRES_USER: clavis
-      POSTGRES_PASSWORD: clavis_password
+      POSTGRES_DB: ${DB_NAME:-clavis_iam}
+      POSTGRES_USER: ${DB_USER:-clavis}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -331,21 +182,20 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/clavis_iam
-      SPRING_DATASOURCE_USERNAME: clavis
-      SPRING_DATASOURCE_PASSWORD: clavis_password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-clavis_iam}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER:-clavis}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_FLYWAY_ENABLED: "true"
     depends_on:
       - postgres
 
 volumes:
   postgres_data:
-```
+```[cite: 1]
 
----
+## Running the Application
 
-## Run
-
-```bash
-docker-compose up --build -d
-```
+1. Set up your local environment file (`.env`) containing your production secrets (database credentials and RSA keys).
+2. Start the services using Docker Compose[cite: 1]:
+   ```bash
+   docker-compose up --build -d
